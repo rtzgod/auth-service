@@ -5,6 +5,8 @@ import (
 	"github.com/rtzgod/auth-service/internal/config"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 const (
@@ -21,7 +23,18 @@ func main() {
 
 	application := app.NewApp(log, cfg.GRPC.Port)
 
-	application.GRPCServer.MustRun()
+	go application.GRPCServer.MustRun()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	sign := <-sigChan
+
+	log.Info("stopping app,", slog.String("signal:", sign.String()))
+
+	application.GRPCServer.Stop()
+
+	log.Info("application stopped")
 }
 
 func setupLogger(env string) *slog.Logger {
