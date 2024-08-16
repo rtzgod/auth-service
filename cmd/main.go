@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/rtzgod/auth-service/internal/app"
 	"github.com/rtzgod/auth-service/internal/config"
 	"log/slog"
 	"os"
@@ -13,12 +14,14 @@ const (
 )
 
 func main() {
-	// TODO: configs (cleanenv)
 	cfg := config.MustLoad()
-	// TODO: logger (slog)
+
 	log := setupLogger(cfg.Env)
 	log.Info("starting app", slog.String("env", cfg.Env))
-	// TODO: app
+
+	application := app.NewApp(log, cfg.GRPC.Port)
+
+	application.GRPCServer.MustRun()
 }
 
 func setupLogger(env string) *slog.Logger {
