@@ -14,10 +14,10 @@ type Server struct {
 	port       int
 }
 
-func NewServer(log *slog.Logger, port int) *Server {
+func NewServer(log *slog.Logger, port int, authService grpchandler.AuthService) *Server {
 	gRPCServer := grpc.NewServer()
 
-	grpchandler.AddHandler(gRPCServer, nil)
+	grpchandler.AddHandler(gRPCServer, authService)
 
 	return &Server{
 		log:        log,

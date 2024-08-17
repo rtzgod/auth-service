@@ -4,3 +4,9 @@ grpc:
   port: 44044
   timeout: 1h
 
+postgres:
+  host: "localhost"
+  port: "5432"
+  user: "postgres"
+  dbname: "postgres"
+  sslmode: "disable"

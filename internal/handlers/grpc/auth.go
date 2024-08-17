@@ -48,7 +48,7 @@ func (h *GRPCHandler) IsAdmin(ctx context.Context, req *authv1.IsAdminRequest) (
 		return nil, err
 	}
 
-	isAdmin, err := h.authService.IsAdmin(ctx, int(req.GetUserId()))
+	isAdmin, err := h.authService.IsAdmin(ctx, req.GetUserId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

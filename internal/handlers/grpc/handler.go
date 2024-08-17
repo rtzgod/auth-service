@@ -9,7 +9,7 @@ import (
 type AuthService interface {
 	SignIn(ctx context.Context, email, password string, appId int) (token string, err error)
 	SignUp(ctx context.Context, email, password string) (userId int64, err error)
-	IsAdmin(ctx context.Context, userId int) (isAdmin bool, err error)
+	IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error)
 }
 
 type GRPCHandler struct {

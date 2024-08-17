@@ -9,13 +9,22 @@ import (
 )
 
 type Config struct {
-	Env  string     `yaml:"env" env-default:"local"`
-	GRPC GRPCConfig `yaml:"grpc"`
+	Env      string         `yaml:"env" env-default:"local"`
+	GRPC     GRPCConfig     `yaml:"grpc"`
+	Postgres PostgresConfig `yaml:"postgres"`
 }
 
 type GRPCConfig struct {
 	Port    int           `yaml:"port"`
 	Timeout time.Duration `yaml:"timeout"`
+}
+type PostgresConfig struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"dbname"`
+	SSLMode  string `yaml:"sslmode"`
 }
 
 func MustLoad() *Config {
@@ -30,6 +39,8 @@ func MustLoad() *Config {
 	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		panic("failed to read config: " + err.Error())
 	}
+
+	cfg.Postgres.Password = fetchPostgresPassword()
 
 	return &cfg
 }
@@ -48,5 +59,17 @@ func fetchConfigPath() string {
 		}
 		res = os.Getenv("CONFIG_PATH")
 	}
+	return res
+}
+
+func fetchPostgresPassword() string {
+	var res string
+
+	if err := godotenv.Load(".env"); err != nil {
+		panic("failed to load .env file: " + err.Error())
+	}
+
+	res = os.Getenv("POSTGRES_PASSWORD")
+
 	return res
 }

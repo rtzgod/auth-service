@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/rtzgod/auth-service/internal/app"
 	"github.com/rtzgod/auth-service/internal/config"
+	"github.com/rtzgod/auth-service/internal/db"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -21,7 +22,18 @@ func main() {
 	log := setupLogger(cfg.Env)
 	log.Info("starting app", slog.String("env", cfg.Env))
 
-	application := app.NewApp(log, cfg.GRPC.Port)
+	database := db.NewPostgres(
+		cfg.Postgres.Host,
+		cfg.Postgres.Port,
+		cfg.Postgres.User,
+		cfg.Postgres.Password,
+		cfg.Postgres.DBName,
+		cfg.Postgres.SSLMode)
+
+	// Applying migrations to db
+	db.MigrateUp(database.DB)
+
+	application := app.NewApp(database, log, cfg.GRPC.Port, cfg.GRPC.Timeout)
 
 	go application.GRPCServer.MustRun()
 
