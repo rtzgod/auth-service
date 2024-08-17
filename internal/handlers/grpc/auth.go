@@ -11,6 +11,21 @@ const (
 	emptyValue = 0
 )
 
+func (h *GRPCHandler) SignIn(ctx context.Context, req *authv1.SignInRequest) (*authv1.SignInResponse, error) {
+
+	if err := validateSignIn(req); err != nil {
+		return nil, err
+	}
+
+	token, err := h.authService.SignIn(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &authv1.SignInResponse{
+		Token: token,
+	}, nil
+}
+
 func (h *GRPCHandler) SignUp(ctx context.Context, req *authv1.SignUpRequest) (*authv1.SignUpResponse, error) {
 
 	if err := validateSignUp(req); err != nil {
@@ -24,21 +39,6 @@ func (h *GRPCHandler) SignUp(ctx context.Context, req *authv1.SignUpRequest) (*a
 
 	return &authv1.SignUpResponse{
 		UserId: userId,
-	}, nil
-}
-
-func (h *GRPCHandler) SignIn(ctx context.Context, req *authv1.SignInRequest) (*authv1.SignInResponse, error) {
-
-	if err := validateSignIn(req); err != nil {
-		return nil, err
-	}
-
-	token, err := h.authService.SignIn(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-	return &authv1.SignInResponse{
-		Token: token,
 	}, nil
 }
 
