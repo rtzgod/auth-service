@@ -52,5 +52,13 @@ func (r *Repository) App(ctx context.Context, appId int) (app entity.App, err er
 }
 
 func (r *Repository) IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error) {
-	panic("implement me")
+	const op = "repository.postgres.IsAdmin"
+
+	query := fmt.Sprintf("select * from %s where id=$1", adminsTable)
+
+	err = r.db.Get(&isAdmin, query, userId)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+	return isAdmin, nil
 }
