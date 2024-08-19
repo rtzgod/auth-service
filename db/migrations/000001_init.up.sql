@@ -1,5 +1,5 @@
 create table if not exists users (
-    id integer primary key,
+    id serial primary key,
     email text not null unique,
     pass_hash text not null
 );
