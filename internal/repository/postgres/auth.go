@@ -2,8 +2,12 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"github.com/rtzgod/auth-service/internal/domain/entity"
+	"github.com/rtzgod/auth-service/internal/repository"
 )
 
 const (
@@ -19,6 +23,10 @@ func (r *Repository) SaveUser(ctx context.Context, email string, passHash []byte
 
 	err = r.db.Get(&id, query, email, passHash)
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return 0, fmt.Errorf("%s: %w", op, repository.ErrUserExists)
+		}
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -32,6 +40,9 @@ func (r *Repository) User(ctx context.Context, email string) (user entity.User, 
 
 	err = r.db.Get(&user, query, email)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return entity.User{}, fmt.Errorf("%s: %w", op, repository.ErrUserNotFound)
+		}
 		return entity.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -45,6 +56,9 @@ func (r *Repository) App(ctx context.Context, appId int) (app entity.App, err er
 
 	err = r.db.Get(&app, query, appId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return entity.App{}, fmt.Errorf("%s: %w", op, repository.ErrAppNotFound)
+		}
 		return entity.App{}, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -58,6 +72,9 @@ func (r *Repository) IsAdmin(ctx context.Context, userId int64) (isAdmin bool, e
 
 	err = r.db.Get(&isAdmin, query, userId)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, fmt.Errorf("%s: %w", op, repository.ErrUserNotFound)
+		}
 		return false, fmt.Errorf("%s: %w", op, err)
 	}
 	return isAdmin, nil
