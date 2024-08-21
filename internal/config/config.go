@@ -40,7 +40,7 @@ func MustLoad() *Config {
 		panic("failed to read config: " + err.Error())
 	}
 
-	cfg.Postgres.Password = fetchPostgresPassword()
+	cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.DBName = fetchPostgresEnv()
 
 	return &cfg
 }
@@ -62,14 +62,15 @@ func fetchConfigPath() string {
 	return res
 }
 
-func fetchPostgresPassword() string {
-	var res string
+func fetchPostgresEnv() (user, password, dbname string) {
 
 	if err := godotenv.Load(".env"); err != nil {
 		panic("failed to load .env file: " + err.Error())
 	}
 
-	res = os.Getenv("POSTGRES_PASSWORD")
+	user = os.Getenv("POSTGRES_USER")
+	password = os.Getenv("POSTGRES_PASSWORD")
+	dbname = os.Getenv("POSTGRES_DB")
 
-	return res
+	return user, password, dbname
 }

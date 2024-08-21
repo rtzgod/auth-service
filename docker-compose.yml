@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "44044:44044"
+    restart: on-failure
+    depends_on:
+      - db
+  db:
+    restart: on-failure
+    image: postgres:latest
+    container_name: db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5436:5432'
+
+volumes:
+  postgres_data:
