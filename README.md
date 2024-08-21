@@ -58,6 +58,8 @@ App performs db migrations in-code, you can create your own migration schemas in
 migrate create -ext sql -dir ./db/migrations -seq init
 ```
 
+or you can create migration files manually and set versions of migrations by yourself
+
 Also after creating migrations you can perform any capable operations with it
 ```bash
 # For detailed usage of migrate command
