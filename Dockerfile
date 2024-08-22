@@ -20,7 +20,7 @@ WORKDIR /root/
 COPY --from=builder /app/main .
 
 RUN mkdir -p /root/configs
-COPY configs/local.yaml /root/configs/
+COPY configs/dev.yaml /root/configs/
 COPY .env .
 
 RUN mkdir -p /root/db/migrations

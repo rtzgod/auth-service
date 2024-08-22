@@ -22,13 +22,7 @@ func main() {
 	log := setupLogger(cfg.Env)
 	log.Info("starting app", slog.String("env", cfg.Env))
 
-	database := db.NewPostgres(
-		cfg.Postgres.Host,
-		cfg.Postgres.Port,
-		cfg.Postgres.User,
-		cfg.Postgres.Password,
-		cfg.Postgres.DBName,
-		cfg.Postgres.SSLMode)
+	database := db.NewPostgres(cfg.Postgres.Url)
 
 	// Applying migrations to db
 	db.MigrateUp(database.DB)
