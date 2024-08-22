@@ -19,17 +19,21 @@ type GRPCConfig struct {
 	Timeout time.Duration `yaml:"timeout"`
 }
 type PostgresConfig struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	DBName   string `yaml:"dbname"`
-	SSLMode  string `yaml:"sslmode"`
+	Url string `yaml:"url"`
 }
 
 func MustLoad() *Config {
 
 	path := fetchConfigPath()
+
+	if path == "" {
+		panic("config path is empty")
+	}
+
+	return MustLoadPath(path)
+}
+
+func MustLoadPath(path string) *Config {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		panic("config file doesn't exist" + path)
 	}
@@ -39,8 +43,6 @@ func MustLoad() *Config {
 	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		panic("failed to read config: " + err.Error())
 	}
-
-	cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.DBName = fetchPostgresEnv()
 
 	return &cfg
 }
@@ -60,17 +62,4 @@ func fetchConfigPath() string {
 		res = os.Getenv("CONFIG_PATH")
 	}
 	return res
-}
-
-func fetchPostgresEnv() (user, password, dbname string) {
-
-	if err := godotenv.Load(".env"); err != nil {
-		panic("failed to load .env file: " + err.Error())
-	}
-
-	user = os.Getenv("POSTGRES_USER")
-	password = os.Getenv("POSTGRES_PASSWORD")
-	dbname = os.Getenv("POSTGRES_DB")
-
-	return user, password, dbname
 }
