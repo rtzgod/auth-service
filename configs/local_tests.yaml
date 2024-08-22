@@ -2,7 +2,7 @@ env: "dev"
 
 grpc:
   port: 44044
-  timeout: 30s
+  timeout: 1h
 
 postgres:
   url: "postgres://postgres:1@localhost:5432/postgres?sslmode=disable"
